@@ -1,6 +1,5 @@
-import axios from 'axios';
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import catApi from './utils/catApi';
 
 interface Imagem {
@@ -10,43 +9,51 @@ interface Imagem {
 export default function App() {
   const [imagens, setImagens] = useState<Imagem[]>([])
 
-  const exibirImagem = async () => {
+  const exibirImagens = async () => {
     const resposta = await catApi.get('search')
     setImagens(resposta.data)
   }
 
   return (
     <View style={styles.container}>
-      <Text>Bem-vindo ao Gatix!</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>😻 Gatix</Text>
+      </View>
+
+      <View style={styles.list}>
+        <FlatList 
+          contentContainerStyle={styles.listContent}
+          data={imagens}
+          keyExtractor={(item) => item.url}
+          renderItem={({item}) => (
+            <Image 
+            style={styles.image}
+            source={{uri: item.url}}
+            />
+          )}
+        />
+      </View>
+      
       <Pressable
         style={styles.button}
-        onPress={exibirImagem}
+        onPress={exibirImagens}
       >
         <Text
           style={styles.buttonText}
         >Buscar gatinhos!</Text>
       </Pressable>
-      <View>
-        {
-          imagens.map(imagem => (
-            <Image 
-            style={styles.image}
-            source={{uri: imagem.url}}
-            />
-          ))
-        }
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   button:{
-    width: '80%',
     backgroundColor: '#0096F3',
-    padding: 32,
     borderRadius: 8,
-    margin: 16
+    bottom: 16,
+    padding: 16,
+    position: 'absolute',
+    width: '80%',
   },
   buttonText:{
     color: 'white',
@@ -55,14 +62,33 @@ const styles = StyleSheet.create({
     fontSize: 24
   },
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff',
+    flex: 1,
+  },
+  header: {
+    backgroundColor: '#0096F3',
+    width: '100%'
+  },
+  headerText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    margin: 16,
   },
   image: {
+    borderRadius: 16,
     height: 150,
+    margin: 8,
     width: 150,
-    borderRadius: 16
-  }
+  },
+  list: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
+  listContent: {
+    alignItems: 'center',
+  },
 });
