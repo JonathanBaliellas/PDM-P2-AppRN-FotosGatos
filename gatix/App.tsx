@@ -1,18 +1,18 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import catApi from './utils/catApi';
 
 interface Imagem {
   url: string
 }
 
 export default function App() {
-  const [imagem, setImagem] = useState<Imagem>()
+  const [imagens, setImagens] = useState<Imagem[]>([])
 
   const exibirImagem = async () => {
-    const url = 'https://api.thecatapi.com/v1/images/search'
-    const resposta = await axios.get(url)
-    setImagem(resposta.data[0])
+    const resposta = await catApi.get('search')
+    setImagens(resposta.data)
   }
 
   return (
@@ -27,10 +27,14 @@ export default function App() {
         >Buscar gatinhos!</Text>
       </Pressable>
       <View>
-        <Image 
-          style={styles.image}
-          source={{uri: imagem?.url}}
-        />
+        {
+          imagens.map(imagem => (
+            <Image 
+            style={styles.image}
+            source={{uri: imagem.url}}
+            />
+          ))
+        }
       </View>
     </View>
   );
